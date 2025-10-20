@@ -1,10 +1,17 @@
-const NAMES = [
-  'Артём', 'Мария', 'Иван', 'Анна', 'Дмитрий',
-  'Елена', 'Сергей', 'Ольга', 'Алексей', 'Наталья',
-  'Павел', 'Юлия', 'Михаил', 'Екатерина', 'Андрей'
+const DESCRIPTIONS = [
+  'Прекрасный закат над горным озером',
+  'Утренняя прогулка по лесу',
+  'Город в лучах вечернего солнца',
+  'Тихий пляж без туристов',
+  'Водопад среди дикой природы',
+  'Старинный замок в тумане',
+  'Весенний парк с цветущими деревьями',
+  'Ночное небо, усыпанное звёздами',
+  'Осенняя аллея в парке',
+  'Полет над горами на параплане'
 ];
 
-const MESSAGES = [
+const COMMENTS_MESSAGES = [
   'Всё отлично!',
   'В целом всё неплохо. Но не всё.',
   'Когда вы делаете фотографию, хорошо бы убирать палец из кадра. В конце концов это просто непрофессионально.',
@@ -13,74 +20,61 @@ const MESSAGES = [
   'Лица у людей на фотке перекошены, как будто их избивают. Как можно было поймать такой неудачный момент?!'
 ];
 
-const DESCRIPTIONS = [
-  'Прекрасный закат на море',
-  'Горный пейзаж в утреннем тумане',
-  'Улочки старого города',
-  'Кофе и книга в уютном кафе',
-  'Прогулка по осеннему парку',
-  'Архитектура современного мегаполиса',
-  'Цветущий сад весной',
-  'Ночной город с высоты птичьего полёта',
-  'Путешествие по неизведанным тропам',
-  'Моменты счастливой жизни',
-  'Удивительные формы природы',
-  'Искусство в повседневности',
-  'Вкусные блюда домашней кухни',
-  'Спортивные достижения и тренировки',
-  'Творческие проекты и хобби',
-  'Встреча с друзьями',
-  'Пушистые питомцы и их проделки',
-  'Уютные вечера дома',
-  'Приключения в новых местах',
-  'Красота в мелочах',
-  'Вдохновляющие пейзажи',
-  'Моменты тишины и спокойствия',
-  'Яркие краски лета',
-  'Зимняя сказка за окном',
-  'Магия золотой осени'
+const NAMES = [
+  'Александр',
+  'Мария',
+  'Иван',
+  'Елена',
+  'Дмитрий',
+  'Ольга',
+  'Николай',
+  'Татьяна',
+  'Сергей',
+  'Виктория'
 ];
 
-const getRandomInteger = (min, max) => {
-  const lower = Math.ceil(Math.min(Math.abs(min), Math.abs(max)));
-  const upper = Math.floor(Math.max(Math.abs(min), Math.abs(max)));
-  const result = Math.random() * (upper - lower + 1) + lower;
-  return Math.floor(result);
-};
+function getRandomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
-const getRandomArrayElement = (elements) => elements[getRandomInteger(0, elements.length - 1)];
+function getRandomArrayElement(array) {
+  return array[getRandomInt(0, array.length - 1)];
+}
 
-const createIdGenerator = () => {
-  let lastGeneratedId = 0;
+let commentIdCounter = 1;
 
-  return () => {
-    lastGeneratedId += 1;
-    return lastGeneratedId;
-  };
-};
+function generateComments() {
+  const comments = [];
+  const count = getRandomInt(0, 30);
+  for (let i = 0; i < count; i++) {
+    const sentencesCount = getRandomInt(1, 2);
+    const message = Array.from({ length: sentencesCount }, () => getRandomArrayElement(COMMENTS_MESSAGES))
+      .join(' ');
+    comments.push({
+      id: commentIdCounter++,
+      avatar: `img/avatar-${getRandomInt(1, 6)}.svg`,
+      message,
+      name: getRandomArrayElement(NAMES)
+    });
+  }
+  return comments;
+}
 
-const generateCommentId = createIdGenerator();
-
-const createComment = () => ({
-  id: generateCommentId(),
-  avatar: `img/avatar-${getRandomInteger(1, 6)}.svg`,
-  message: getRandomArrayElement(MESSAGES),
-  name: getRandomArrayElement(NAMES)
-});
-
-const createPhoto = (index) => {
-  const photoId = index + 1;
-  const commentsCount = getRandomInteger(0, 30);
-
+function createPhotoDescription(index) {
   return {
-    id: photoId,
-    url: `photos/${photoId}.jpg`,
-    description: DESCRIPTIONS[index],
-    likes: getRandomInteger(15, 200),
-    comments: Array.from({length: commentsCount}, createComment)
+    id: index,
+    url: `photos/${index}.jpg`,
+    description: getRandomArrayElement(DESCRIPTIONS),
+    likes: getRandomInt(15, 200),
+    comments: generateComments()
   };
-};
+}
 
-const generatePhotos = () => Array.from({length: 25}, (_, index) => createPhoto(index));
+function generatePhotos() {
+  return Array.from({ length: 25 }, (_, i) => createPhotoDescription(i + 1));
+}
 
-export { generatePhotos, getRandomInteger, getRandomArrayElement };
+const photos = generatePhotos();
+
+// eslint-disable-next-line no-console
+console.log(photos);
