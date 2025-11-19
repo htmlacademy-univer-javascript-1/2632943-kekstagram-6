@@ -1,5 +1,3 @@
-const { get } = require("browser-sync");
-
 const names = [
   'Александр',
   'Мария',
@@ -60,7 +58,7 @@ function getComments(){
 function createPhoto(id){
   return {
     id: id,
-    url: 'photos/{{id}}.jpg',
+    url: 'photos/{id}.jpg',
     desccription: descriptions[getRandomNumber(0, descriptions.length - 1)],
     likes: getRandomNumber(15, 200),
     comments: getComments()
