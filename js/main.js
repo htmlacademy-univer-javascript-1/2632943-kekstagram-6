@@ -40,7 +40,7 @@ function getRandomNumber(min, max){
 function getComment(id){
   return {
     id: id,
-    avatar: 'img/avatar-{{getRandomNumber(1,6)}}.svg',
+    avatar: 'img/avatar-{getRandomNumber(1,6)}.svg',
     message: messages[getRandomNumber(0, messages.length - 1)],
     name:  names[getRandomNumber(0, names.length - 1)],
   };
