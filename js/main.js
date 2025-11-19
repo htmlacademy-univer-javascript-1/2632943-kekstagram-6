@@ -40,7 +40,7 @@ function getRandomNumber(min, max){
 function getComment(id){
   return {
     id: id,
-    avatar: 'img/avatar-{getRandomNumber(1,6)}.svg',
+    avatar: `img/avatar-${getRandomNumber(1, 6)}.svg`,
     message: messages[getRandomNumber(0, messages.length - 1)],
     name:  names[getRandomNumber(0, names.length - 1)],
   };
@@ -58,7 +58,7 @@ function getComments(){
 function createPhoto(id){
   return {
     id: id,
-    url: 'photos/{id}.jpg',
+    url: `photos/${id}.jpg`,
     desccription: descriptions[getRandomNumber(0, descriptions.length - 1)],
     likes: getRandomNumber(15, 200),
     comments: getComments()
