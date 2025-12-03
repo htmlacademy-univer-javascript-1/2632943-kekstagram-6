@@ -1,40 +1,38 @@
-import { getRandomNumber, getRandomElement } from './util.js';
-import { names, messages, descriptions } from './data.js';
+import { getRandomNumber } from './util.js';
+import { NAMES, MESSAGES, DESCRIPTIONS } from './data.js';
 
-let commentIdCounter = 1;
-
-function createComment() {
+function getComment(id){
   return {
-    id: commentIdCounter++,
+    id: id,
     avatar: `img/avatar-${getRandomNumber(1, 6)}.svg`,
-    message: getRandomElement(messages),
-    name: getRandomElement(names)
+    message: MESSAGES[getRandomNumber(0, MESSAGES.length - 1)],
+    name:  NAMES[getRandomNumber(0, NAMES.length - 1)],
   };
 }
 
-function createPhoto(id) {
-  const commentsCount = getRandomNumber(0, 30);
+function getComments(){
   const comments = [];
-
-  for (let i = 0; i < commentsCount; i++) {
-    comments.push(createComment());
+  for (let i = 1; i <= getRandomNumber(0, 30); i++){
+    comments.push(getComment(i));
   }
+  return comments;
+}
 
+function createPhoto(id){
   return {
     id: id,
     url: `photos/${id}.jpg`,
-    description: getRandomElement(descriptions),
+    desccription: DESCRIPTIONS[getRandomNumber(0, DESCRIPTIONS.length - 1)],
     likes: getRandomNumber(15, 200),
-    comments: comments
+    comments: getComments()
   };
 }
 
-export function generatePhotos() {
+export function createPhotos(){
   const photos = [];
-
-  for (let i = 1; i <= 25; i++) {
+  for (let i = 1; i <= 25; i++){
     photos.push(createPhoto(i));
   }
-
   return photos;
 }
+

@@ -1,6 +1,6 @@
-import { generatePhotos } from './photo-generator.js';
+import { createPhotos } from './photo-generator.js';
 
-const photoArray = generatePhotos();
+const photoArray = createPhotos();
 
 // eslint-disable-next-line no-console
 console.log(photoArray);
