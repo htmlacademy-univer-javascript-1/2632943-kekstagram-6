@@ -1,3 +1,6 @@
+import { resetScale } from './scale.js';
+import { resetEffects } from './effect.js';
+
 const uploadForm = document.querySelector('.img-upload__form');
 const uploadInput = uploadForm.querySelector('.img-upload__input');
 const uploadOverlay = uploadForm.querySelector('.img-upload__overlay');
@@ -5,6 +8,7 @@ const uploadCancel = uploadForm.querySelector('.img-upload__cancel');
 const body = document.querySelector('body');
 const hashtagsInput = uploadForm.querySelector('.text__hashtags');
 const descriptionInput = uploadForm.querySelector('.text__description');
+const submitButton = uploadForm.querySelector('.img-upload__submit');
 
 const pristine = new Pristine(uploadForm, {
   classTo: 'img-upload__field-wrapper',
@@ -49,15 +53,86 @@ const isDescriptionValid = (value) => value.length <= 140;
 
 pristine.addValidator(descriptionInput, isDescriptionValid, 'Длина комментария не может составлять больше 140 символов');
 
+const blockSubmitButton = () => {
+  submitButton.disabled = true;
+  submitButton.textContent = 'Публикую...';
+};
+
+const unblockSubmitButton = () => {
+  submitButton.disabled = false;
+  submitButton.textContent = 'Опубликовать';
+};
+
+const showMessage = (templateId) => {
+  const template = document.querySelector(templateId).content.querySelector('section');
+  const messageElement = template.cloneNode(true);
+  body.append(messageElement);
+
+  const onMessageKeydown = (evt) => {
+    if (evt.key === 'Escape') {
+      evt.preventDefault();
+      closeMessage();
+    }
+  };
+
+  const onMessageClick = (evt) => {
+    if (evt.target.closest('.success__inner') && !evt.target.closest('.success__button')) {
+      return;
+    }
+    if (evt.target.closest('.error__inner') && !evt.target.closest('.error__button')) {
+      return;
+    }
+    closeMessage();
+  };
+
+  function closeMessage() {
+    messageElement.remove();
+    document.removeEventListener('keydown', onMessageKeydown);
+    document.removeEventListener('click', onMessageClick);
+  }
+
+  document.addEventListener('keydown', onMessageKeydown);
+  document.addEventListener('click', onMessageClick);
+};
+
+const showSuccessMessage = () => showMessage('#success');
+const showErrorMessage = () => showMessage('#error');
+
 const onFormSubmit = (evt) => {
-  if (!pristine.validate()) {
-    evt.preventDefault();
+  evt.preventDefault();
+
+  const isValid = pristine.validate();
+  if (isValid) {
+    blockSubmitButton();
+    const formData = new FormData(evt.target);
+    fetch('https://29.javascript.htmlacademy.pro/kekstagram', {
+      method: 'POST',
+      body: formData,
+    })
+      .then((response) => {
+        if (response.ok) {
+          closeUploadOverlay();
+          showSuccessMessage();
+        } else {
+          showErrorMessage();
+        }
+      })
+      .catch(() => {
+        showErrorMessage();
+      })
+      .finally(() => {
+        unblockSubmitButton();
+      });
   }
 };
 
 const onDocumentKeydown = (evt) => {
   if (evt.key === 'Escape') {
     if (document.activeElement === hashtagsInput || document.activeElement === descriptionInput) {
+      return;
+    }
+    // If error message is shown, don't close the form
+    if (document.querySelector('.error')) {
       return;
     }
     evt.preventDefault();
@@ -81,6 +156,8 @@ function closeUploadOverlay() {
   uploadForm.removeEventListener('submit', onFormSubmit);
   uploadForm.reset();
   pristine.reset();
+  resetScale();
+  resetEffects();
 }
 
 uploadInput.addEventListener('change', openUploadOverlay);
