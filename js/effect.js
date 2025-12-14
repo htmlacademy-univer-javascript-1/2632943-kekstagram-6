@@ -115,6 +115,17 @@ noUiSlider.create(sliderElement, {
   start: DEFAULT_EFFECT.max,
   step: DEFAULT_EFFECT.step,
   connect: 'lower',
+  format: {
+    to: function (value) {
+      if (Number.isInteger(value)) {
+        return value.toFixed(0);
+      }
+      return value.toFixed(1);
+    },
+    from: function (value) {
+      return parseFloat(value);
+    },
+  },
 });
 
 hideSlider();
