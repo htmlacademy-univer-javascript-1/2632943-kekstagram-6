@@ -8,6 +8,15 @@ export function getRandomElement(array) {
   return array[getRandomNumber(0, array.length - 1)];
 }
 
+export function debounce (callback, timeoutDelay = 500) {
+  let timeoutId;
+
+  return (...rest) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => callback.apply(this, rest), timeoutDelay);
+  };
+}
+
 export const showAlert = (message) => {
   const alertContainer = document.createElement('div');
   alertContainer.classList.add('data-error');
