@@ -1,5 +1,6 @@
 import { resetScale } from './scale.js';
 import { resetEffects } from './effect.js';
+import { sendData } from './api.js';
 
 const uploadForm = document.querySelector('.img-upload__form');
 const uploadInput = uploadForm.querySelector('.img-upload__input');
@@ -9,6 +10,10 @@ const body = document.querySelector('body');
 const hashtagsInput = uploadForm.querySelector('.text__hashtags');
 const descriptionInput = uploadForm.querySelector('.text__description');
 const submitButton = uploadForm.querySelector('.img-upload__submit');
+const photoPreview = document.querySelector('.img-upload__preview img');
+const effectsPreviews = document.querySelectorAll('.effects__preview');
+
+const FILE_TYPES = ['jpg', 'jpeg', 'png'];
 
 const pristine = new Pristine(uploadForm, {
   classTo: 'img-upload__field-wrapper',
@@ -104,18 +109,10 @@ const onFormSubmit = (evt) => {
   const isValid = pristine.validate();
   if (isValid) {
     blockSubmitButton();
-    const formData = new FormData(evt.target);
-    fetch('https://29.javascript.htmlacademy.pro/kekstagram', {
-      method: 'POST',
-      body: formData,
-    })
-      .then((response) => {
-        if (response.ok) {
-          closeUploadOverlay();
-          showSuccessMessage();
-        } else {
-          showErrorMessage();
-        }
+    sendData(new FormData(evt.target))
+      .then(() => {
+        closeUploadOverlay();
+        showSuccessMessage();
       })
       .catch(() => {
         showErrorMessage();
@@ -158,6 +155,25 @@ function closeUploadOverlay() {
   pristine.reset();
   resetScale();
   resetEffects();
+  photoPreview.src = 'img/upload-default-image.jpg';
+  effectsPreviews.forEach((preview) => {
+    preview.style.backgroundImage = '';
+  });
 }
 
-uploadInput.addEventListener('change', openUploadOverlay);
+const onUploadInputChange = () => {
+  const file = uploadInput.files[0];
+  const fileName = file.name.toLowerCase();
+  const matches = FILE_TYPES.some((it) => fileName.endsWith(it));
+
+  if (matches) {
+    const url = URL.createObjectURL(file);
+    photoPreview.src = url;
+    effectsPreviews.forEach((preview) => {
+      preview.style.backgroundImage = `url(${url})`;
+    });
+  }
+  openUploadOverlay();
+};
+
+uploadInput.addEventListener('change', onUploadInputChange);

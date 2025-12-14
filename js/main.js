@@ -1,7 +1,13 @@
-import { generatePhotos } from './photo-generator.js';
 import { renderThumbnails } from './thumbnail.js';
+import { getData } from './api.js';
+import { showAlert } from './util.js';
 import './form.js';
 
-const pictures = generatePhotos();
-renderThumbnails(pictures);
+getData()
+  .then((pictures) => {
+    renderThumbnails(pictures);
+  })
+  .catch((err) => {
+    showAlert(err.message);
+  });
 
